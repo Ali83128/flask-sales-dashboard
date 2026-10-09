@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sign in · Northwind Sales</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+</head>
+<body class="auth-body">
+<div class="auth-wrap">
+  <section class="auth-panel">
+    <div class="brand brand-lg"><span class="brand-mark">N</span><span>Northwind<small>Sales Ops</small></span></div>
+    <h1>Welcome back</h1>
+    <p class="muted">Sign in to see revenue, orders and product performance.</p>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <div class="flash flash-{{ category }}" role="alert">{{ message }}</div>
+      {% endfor %}
+    {% endwith %}
+    <form method="post" class="form" novalidate>
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <label>Email
+        <input type="email" name="email" value="{{ email }}" autocomplete="username" required autofocus>
+      </label>
+      <label>Password
+        <input type="password" name="password" autocomplete="current-password" required>
+      </label>
+      <button class="btn btn-primary btn-block" type="submit">Sign in</button>
+    </form>
+    <div class="demo-hint">
+      <span class="badge badge-demo">Demo account</span>
+      <span class="creds"><code>demo@example.com</code> / <code>demo1234</code></span>
+    </div>
+  </section>
+  <section class="auth-art" aria-hidden="true">
+    <div class="art-card">
+      <small>Revenue, last 90 days</small>
+      <strong>Live KPIs</strong>
+      <svg viewBox="0 0 320 120" preserveAspectRatio="none" class="art-line"><polyline points="0,100 40,92 80,96 120,70 160,74 200,50 240,56 280,30 320,22" /></svg>
+    </div>
+    <ul class="art-list">
+      <li>KPI cards with period-over-period change</li>
+      <li>Filterable orders with CSV export</li>
+      <li>Product catalogue management</li>
+      <li>JSON API for your other tools</li>
+    </ul>
+  </section>
+</div>
+</body>
+</html>

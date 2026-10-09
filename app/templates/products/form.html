@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit ' ~ product.sku if product else 'New product' }}{% endblock %}
+{% block heading %}{{ 'Edit product' if product else 'New product' }}{% endblock %}
+{% block subheading %}{{ product.sku ~ ' · ' ~ product.name if product else 'Add an item to the catalogue' }}{% endblock %}
+{% block content %}
+<div class="form-layout">
+  <form method="post" class="card form" novalidate>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    {% macro field(name, label, type='text', step=None) -%}
+      <label class="{{ 'has-error' if errors[name] }}">{{ label }}
+        <input type="{{ type }}" name="{{ name }}" value="{{ form.get(name, '') }}" {% if step %}step="{{ step }}"{% endif %}>
+        {% if errors[name] %}<span class="field-error">{{ errors[name] }}</span>{% endif %}
+      </label>
+    {%- endmacro %}
+    <div class="form-row">
+      {{ field('name', 'Product name') }}
+      {{ field('sku', 'SKU') }}
+    </div>
+    <div class="form-row">
+      <label class="{{ 'has-error' if errors.category }}">Category
+        <select name="category">
+          <option value="">Choose a category</option>
+          {% for c in categories %}<option value="{{ c }}" {{ 'selected' if c == form.get('category') }}>{{ c }}</option>{% endfor %}
+        </select>
+        {% if errors.category %}<span class="field-error">{{ errors.category }}</span>{% endif %}
+      </label>
+      {{ field('price', 'Price (USD)', 'number', '0.01') }}
+      {{ field('stock', 'Units in stock', 'number', '1') }}
+    </div>
+    <label class="check"><input type="checkbox" name="active" {{ 'checked' if form.get('active', true) }}> Active (visible to the sales team)</label>
+    <div class="form-actions">
+      <button class="btn btn-primary" type="submit">{{ 'Save changes' if product else 'Create product' }}</button>
+      <a class="btn btn-ghost" href="{{ url_for('products.index') }}">Cancel</a>
+    </div>
+  </form>
+  {% if product %}
+  <aside class="card side-note">
+    <h2>Danger zone</h2>
+    <p class="muted">Products with order history are archived instead of deleted, so past reports stay accurate.</p>
+    <form method="post" action="{{ url_for('products.delete', product_id=product.id) }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button class="btn btn-danger" type="submit">Delete or archive</button>
+    </form>
+  </aside>
+  {% endif %}
+</div>
+{% endblock %}

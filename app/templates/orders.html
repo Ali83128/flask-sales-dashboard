@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}Orders{% endblock %}
+{% block heading %}Orders{% endblock %}
+{% block subheading %}{{ '{:,}'.format(pagination.total) }} matching orders{% endblock %}
+{% block actions %}
+  <a class="btn btn-secondary" href="{{ url_for('orders.export_csv', **filters) }}">Export CSV</a>
+{% endblock %}
+{% block content %}
+<form class="card filters" method="get">
+  <label class="grow">Search
+    <input type="search" name="q" value="{{ filters.q }}" placeholder="Order number, customer or email">
+  </label>
+  <label>Status
+    <select name="status">
+      <option value="">All statuses</option>
+      {% for s in statuses %}<option value="{{ s }}" {{ 'selected' if s == filters.status }}>{{ s|capitalize }}</option>{% endfor %}
+    </select>
+  </label>
+  <label>Region
+    <select name="region">
+      <option value="">All regions</option>
+      {% for r in regions %}<option value="{{ r }}" {{ 'selected' if r == filters.region }}>{{ r }}</option>{% endfor %}
+    </select>
+  </label>
+  <div class="filter-actions">
+    <button class="btn btn-primary" type="submit">Apply</button>
+    <a class="btn btn-ghost" href="{{ url_for('orders.index') }}">Reset</a>
+  </div>
+</form>
+
+<div class="card table-card">
+  <table class="table">
+    <thead>
+      <tr><th>Order</th><th>Date</th><th>Customer</th><th>Product</th><th class="num">Qty</th>
+          <th class="num">Total</th><th>Region</th><th>Status</th></tr>
+    </thead>
+    <tbody>
+    {% for o in pagination.items %}
+      <tr>
+        <td class="mono">{{ o.number }}</td>
+        <td>{{ o.created_at.strftime('%b %d, %Y') }}</td>
+        <td><strong>{{ o.customer.name }}</strong><small class="muted block">{{ o.customer.email }}</small></td>
+        <td>{{ o.product.name }}</td>
+        <td class="num">{{ o.quantity }}</td>
+        <td class="num">{{ o.total|money }}</td>
+        <td>{{ o.region }}</td>
+        <td><span class="pill pill-{{ o.status }}">{{ o.status|capitalize }}</span></td>
+      </tr>
+    {% else %}
+      <tr><td colspan="8" class="empty">No orders match these filters.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% if pagination.pages > 1 %}
+  <nav class="pager" aria-label="Pagination">
+    <span class="muted">Page {{ pagination.page }} of {{ pagination.pages }}</span>
+    <div>
+      {% if pagination.has_prev %}<a class="btn btn-ghost" href="{{ url_for('orders.index', page=pagination.prev_num, **filters) }}">Previous</a>{% endif %}
+      {% if pagination.has_next %}<a class="btn btn-ghost" href="{{ url_for('orders.index', page=pagination.next_num, **filters) }}">Next</a>{% endif %}
+    </div>
+  </nav>
+  {% endif %}
+</div>
+{% endblock %}

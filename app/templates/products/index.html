@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Products{% endblock %}
+{% block heading %}Products{% endblock %}
+{% block subheading %}{{ rows|length }} products{% endblock %}
+{% block actions %}<a class="btn btn-primary" href="{{ url_for('products.create') }}">New product</a>{% endblock %}
+{% block content %}
+<div class="chips">
+  <a class="chip {{ 'active' if not active_category }}" href="{{ url_for('products.index') }}">All</a>
+  {% for c in categories %}
+    <a class="chip {{ 'active' if c == active_category }}" href="{{ url_for('products.index', category=c) }}">{{ c }}</a>
+  {% endfor %}
+</div>
+<div class="card table-card">
+  <table class="table">
+    <thead><tr><th>SKU</th><th>Name</th><th>Category</th><th class="num">Price</th><th class="num">Stock</th>
+      <th class="num">Paid orders</th><th class="num">Revenue</th><th>Status</th><th></th></tr></thead>
+    <tbody>
+    {% for p, order_count, revenue in rows %}
+      <tr>
+        <td class="mono">{{ p.sku }}</td>
+        <td><strong>{{ p.name }}</strong></td>
+        <td>{{ p.category }}</td>
+        <td class="num">{{ p.price|money }}</td>
+        <td class="num {{ 'warn' if p.stock < 20 }}">{{ p.stock }}</td>
+        <td class="num">{{ '{:,}'.format(order_count) }}</td>
+        <td class="num">{{ revenue|money }}</td>
+        <td><span class="pill {{ 'pill-paid' if p.active else 'pill-archived' }}">{{ 'Active' if p.active else 'Archived' }}</span></td>
+        <td class="row-actions"><a href="{{ url_for('products.edit', product_id=p.id) }}">Edit</a></td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
